@@ -1,0 +1,24 @@
+<div class="container">
+  <div *ngIf="movie$ | async as movie; else loading">
+    <app-movie
+      [movie]="movie"
+    ></app-movie>
+    <p>C этим фильмом часто смотрят:</p>
+    <div *ngIf="recommendedMovieCards$ | async as movieCards" class="movieCardList">
+      <app-movie-card-list
+        [movieCards]="movieCards"
+      ></app-movie-card-list>
+      <div class="download-block">
+        <div class="btn btn-link" *ngIf="resultPage > 1">
+          <a [routerLink]="['/movie', movie.id]" (click)="previousResultPage(movie.id)">Назад</a>
+        </div>
+        <div class="btn btn-link" *ngIf="movieCards.length === 20">
+        <a [routerLink]="['/movie', movie.id]" (click)="nextResultPage(movie.id)">Смотреть ещё</a>
+      </div>
+      </div>
+    </div>
+  </div>
+  <ng-template #loading>
+    <p>Загрузка фильма...</p>
+  </ng-template>
+</div>

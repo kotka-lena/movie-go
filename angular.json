@@ -123,6 +123,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "movie-go"
+    }
+  },
+  "defaultProject": "movie-go",
+  "cli": {
+    "analytics": "da529c52-cc2f-4ff2-a71d-13974b8d81e3"
+  }
 }

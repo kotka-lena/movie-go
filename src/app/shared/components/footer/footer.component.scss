@@ -1,0 +1,12 @@
+footer {
+  background: #2d226e;
+  font-size: 13px;
+  color: #a2add0;
+
+  .footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-end;
+  }
+}

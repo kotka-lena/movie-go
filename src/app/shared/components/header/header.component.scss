@@ -1,0 +1,47 @@
+header {
+  background: #2d226e;
+
+  .header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .logo {
+    font-weight: bold;
+  }
+
+  .navigationSearch {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .searchForm {
+    padding: 0 0 0 1.5em;
+  }
+
+  nav {
+
+    ul {
+      list-style-type: none;
+      margin: 0; padding: 0;
+
+      li {
+        float: left;
+
+        a {
+          padding: 0 1.5em;
+          font-size: 1em;
+
+          &:hover {
+            color: #c364c5;
+          }
+        }
+      }
+    }
+  }
+
+}

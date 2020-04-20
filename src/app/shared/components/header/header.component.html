@@ -1,0 +1,22 @@
+<header>
+  <div class="container">
+    <div class="header">
+      <a routerLink="/" class="logo">MovieGo</a>
+      <div class="navigationSearch">
+        <nav>
+          <ul>
+            <li><a routerLink="/">Фильмы</a></li>
+            <li><a routerLink="/favourites">Избранное</a></li>
+          </ul>
+        </nav>
+        <form class="searchForm">
+            <label>
+              <input placeholder="Фильм" [(ngModel)]="searchString" name="search"/>
+            </label>
+            <button class="btn" type="submit" (click)="goToSearchPage()">Поиск</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+

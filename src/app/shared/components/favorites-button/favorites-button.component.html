@@ -1,0 +1,13 @@
+<div class="fav-box">
+  <button class="btn in-favorites" [ngStyle]="{display: inFavourites ? '' : 'none'}"
+  >В Избранном
+  </button> &nbsp;
+  <button class="btn" [ngStyle]="{display: inFavourites ? '' : 'none'}"
+          (click)="favService.remove(movieId)"
+  >Удалить
+  </button>
+  <button class="btn" [ngStyle]="{display: inFavourites ? 'none' : ''}"
+          (click)="favService.add(movieId)"
+  >В Избранное
+  </button>
+</div>

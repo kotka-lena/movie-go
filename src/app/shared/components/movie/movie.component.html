@@ -1,0 +1,24 @@
+<div class="movie" *ngIf="movie !== undefined">
+  <img src="https://image.tmdb.org/t/p/w300/{{movie.poster_path}}" alt="Poster">
+  <div class="movie-info">
+    <div class="movie-info-upper">
+      <div class="movie-info-detail">
+        <h2>{{movie.title}}</h2>
+        <p>{{movie.original_title}}</p>
+        <small *ngFor="let prodCountry of movie.production_countries">
+          {{prodCountry.name}}
+        </small>
+        <small>{{movie.release_date | slice:0:4}} г</small>
+        <div class="movie-genres-box">
+          <app-genre-list
+            [genreIds]="genreIds"
+          ></app-genre-list>
+        </div>
+      </div>
+      <app-favorites-button
+        [movieId]="movie.id"
+      ></app-favorites-button>
+    </div>
+    <small>{{movie.overview}}</small>
+  </div>
+</div>

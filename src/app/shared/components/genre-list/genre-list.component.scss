@@ -1,0 +1,13 @@
+.genre-list {
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 11px;
+
+  .genre {
+    height: 1rem;
+    margin: 2px;
+    text-align: center;
+    padding: 1px 3px;
+    background: #39373d;
+  }
+}

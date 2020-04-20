@@ -1,0 +1,10 @@
+.fav-box {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  .in-favorites {
+    background: #c364c5;
+  }
+}

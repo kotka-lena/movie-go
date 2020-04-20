@@ -1,0 +1,10 @@
+<div *ngIf="movieCards.length; else noMovieCards">
+  <div class="movie-card-list">
+    <app-movie-card *ngFor="let movieCard of movieCards"
+      [movieCard]="movieCard"
+    ></app-movie-card>
+  </div>
+</div>
+<ng-template #noMovieCards>
+  <p>Фильмы не найдены</p>
+</ng-template>

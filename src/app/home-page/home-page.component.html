@@ -1,0 +1,18 @@
+<div class="container">
+  <div *ngIf="movieCards$ | async as movieCards; else loading">
+    <app-movie-card-list
+      [movieCards]="movieCards"
+    ></app-movie-card-list>
+    <div class="download-block">
+      <div class="btn btn-link" *ngIf="resultPage > 1">
+        <a (click)="previousResultPage()">Назад</a>
+      </div>
+      <div class="btn btn-link" *ngIf="movieCards.length === 20">
+        <a (click)="nextResultPage()">Смотреть ещё</a>
+      </div>
+    </div>
+  </div>
+  <ng-template #loading>
+    <p>Загрузка фильмов...</p>
+  </ng-template>
+</div>

@@ -1,0 +1,19 @@
+<div class="container">
+  <p>Избранные фильмы:</p>
+  <div *ngIf="!this.favoriteMovieIds.length">
+    <p>Список избранных фильмов пока пуст.</p>
+  </div>
+  <button class="btn"
+    [ngStyle]="{display: this.favoriteMovieIds.length ? '' : 'none'}"
+    (click)="this.favService.clear()">Очистить список</button>
+  <div *ngIf="movies !== []; else loading">
+    <div class="favMovieList">
+      <app-movie *ngFor="let movie of movies" [ngStyle]="{display: (inList(movie.id)) ? '' : 'none'}"
+        [movie]="movie"
+      ></app-movie>
+    </div>
+  </div>
+  <ng-template #loading>
+    <p>Загружаем избранные фильмы...</p>
+  </ng-template>
+</div>
