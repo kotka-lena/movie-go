@@ -8,12 +8,16 @@ export class GenresService {
 
   genres: Genre[] = [];
   genresLoaded$: Subject<boolean> = new Subject<boolean>();
+  genresLoaded = false;
+  genresLoading = false;
 
   constructor(private moviesService: MoviesService) {
   }
 
   getGenreNameList(genreIds: number[]): string[] {
-    this.loadGenres();
+    if (!this.genresLoaded) {
+      this.loadGenres();
+    }
     const genreNames: string[] = [];
     for (const genre of this.genres) {
       if (this.inList(genre.id, genreIds)) {
@@ -24,14 +28,16 @@ export class GenresService {
   }
 
   loadGenres() {
+    if (this.genresLoading) { return; }
     const maybeGenresString = localStorage.getItem('genres');
     if (maybeGenresString !== null) {
       this.genres = JSON.parse(maybeGenresString);
     } else {
       this.moviesService.fetchGenres().subscribe((genres: Genre[]) => {
         this.genres = genres;
-        this.genresLoaded$.next(true);
+        this.genresLoaded = true;
         localStorage.setItem('genres', JSON.stringify(this.genres));
+        this.genresLoaded$.next(true);
       });
     }
   }
