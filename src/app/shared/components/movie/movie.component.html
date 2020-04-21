@@ -1,5 +1,9 @@
 <div class="movie" *ngIf="movie !== undefined">
-  <img src="https://image.tmdb.org/t/p/w300/{{movie.poster_path}}" alt="Poster">
+  <img *ngIf="movie.poster_path; else emptyPoster"
+       src="https://image.tmdb.org/t/p/w300/{{movie.poster_path}}" alt="Poster" />
+  <ng-template #emptyPoster>
+    <img src="../../../../assets/images/empty_poster.jpg" alt="Poster" />
+  </ng-template>
   <div class="movie-info">
     <div class="movie-info-upper">
       <div class="movie-info-detail">

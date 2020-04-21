@@ -9,11 +9,43 @@
             <li><a routerLink="/favourites">Избранное</a></li>
           </ul>
         </nav>
-        <form class="searchForm">
+        <form class="searchForm" [formGroup]="searchForm" (ngSubmit)="submit()">
+          <div class="inputSearch">
             <label>
-              <input placeholder="Фильм" [(ngModel)]="searchString" name="search"/>
+              <input type="text" placeholder="Фильм" formControlName="search" (keypress)="searchSetup()" (change)="searchSetup()" (keyup)="searchSetup()">
             </label>
-            <button class="btn" type="submit" (click)="goToSearchPage()">Поиск</button>
+            <button class="btn" type="submit">Поиск</button>
+          </div>
+          <div *ngIf="(searchForm.get('search').valid
+                  && searchForm.get('search').dirty)
+                  && !!searchForm.get('search').value
+                  && showResultsBox"
+            class="searchResults"
+          >
+            <ul *ngIf="this.searchInfoByString.has(searchForm.get('search').value.trim()); else loading">
+              <li *ngFor="let movieCard of this.searchInfoByString.get(searchForm.get('search').value.trim())">
+                <a (click)="goToMoviePage(movieCard.id)">
+                  <div class="movie-link">
+                    <img *ngIf="movieCard.poster_path; else emptyPoster"
+                         src="https://image.tmdb.org/t/p/w300/{{movieCard.poster_path}}" alt="Poster" />
+                    <ng-template #emptyPoster>
+                      <img src="../../../../assets/images/empty_poster.jpg" alt="Poster" />
+                    </ng-template>
+                    {{movieCard.title}}, {{movieCard.release_date | slice:0:4}}
+                  </div>
+                </a
+                  >
+              </li>
+            </ul>
+            <ng-template #loading>
+              Загружаем...
+            </ng-template>
+            <div class="openAllResults">
+              <a (click)="goToSearchPage()">
+                Открыть все результаты поиска
+              </a>
+            </div>
+          </div>
         </form>
       </div>
     </div>

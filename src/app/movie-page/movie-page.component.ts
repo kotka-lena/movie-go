@@ -28,10 +28,17 @@ export class MoviePageComponent implements OnInit {
     this.loadingPageNumbers.push(this.currentPageNumber);
     this.movie$ = this.route.params.pipe(
       switchMap((params: Params) => {
-        this.movieCardList$ByPageNumber.push(this.moviesService.fetchRecommendedById(+params.id, this.currentPageNumber));
+        this.loadingPageNumbers = [];
+        this.movieCardList$ByPageNumber = [];
+        this.fetchRecommendedById(+params.id, this.currentPageNumber);
         return this.moviesService.fetchMovieById(+params.id);
       })
     );
+  }
+
+  fetchRecommendedById(movieId: number, currentPageNumber: number) {
+    this.loadingPageNumbers.push(this.currentPageNumber);
+    this.movieCardList$ByPageNumber.push(this.moviesService.fetchRecommendedById(movieId, currentPageNumber));
   }
 
   nextResultPage() {

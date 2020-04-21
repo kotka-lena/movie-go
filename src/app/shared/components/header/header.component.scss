@@ -23,6 +23,69 @@ header {
     padding: 0 0 0 1.5em;
   }
 
+  .inputSearch {
+    width: 250px;
+
+    * {box-sizing: border-box;}
+    input {
+      min-width: 196px;
+    }
+    button {
+      min-width: 30px;
+    }
+  }
+
+  .searchResults {
+    position: absolute;
+    background: white;
+    width: 249px;
+    overflow-y: hidden;
+    max-height: 340px;
+    color: black;
+    font-size: 14px;
+
+    .openAllResults {
+      height: 18px;
+      background: gainsboro;
+      padding: 0.2rem 0.6rem;
+      font-size: 0.8rem;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s ease-in;
+      outline: none;
+    }
+
+    .movie-link {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: flex-end;
+      margin: 3px;
+    }
+
+    img {
+      height: 45px;
+      margin-right: 3px;
+    }
+
+    ul {
+      overflow-y: scroll;
+      max-height: 290px;
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    a {
+      color: black;
+      font-size: 14px;
+
+      &:hover {
+        color: darkmagenta;
+      }
+    }
+  }
+
   nav {
 
     ul {
