@@ -73,7 +73,6 @@ export class FavouritesService implements OnDestroy {
 
   subscribeToAllChanges() {
     if (!this.movieSub) {
-      console.log('subscribeToAllChanges');
       this.movieSub = this.moviesService.movieActivated$.subscribe((movieId: number) => {
         this.nextSubjectForMovieId(movieId);
       });

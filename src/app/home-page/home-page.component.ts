@@ -9,24 +9,29 @@ import {MoviesService} from '../shared/movies.service';
   styleUrls: ['./home-page.component.scss']
 })
 export class HomePageComponent implements OnInit {
-  resultPage: number;
-  movieCards$: Observable<MovieCard[]>;
+  currentPageNumber: number;
+  movieCardList$ByPageNumber: Observable<MovieCard[]>[] = [];
+  loadingPageNumbers: number[] = [];
+  showButtonUp = false;
+
   constructor(private moviesService: MoviesService) { }
 
   ngOnInit(): void {
-    this.resultPage = 1;
-    this.movieCards$ = this.moviesService.fetchMovieCards('', this.resultPage);
+    this.currentPageNumber = 1;
+    this.loadingPageNumbers.push(this.currentPageNumber);
+    this.movieCardList$ByPageNumber.push(this.moviesService.fetchMovieCards('', this.currentPageNumber));
   }
 
   nextResultPage() {
-    this.resultPage++;
-    this.movieCards$ = this.moviesService.fetchMovieCards('', this.resultPage);
+    this.currentPageNumber++;
+    this.loadingPageNumbers.push(this.currentPageNumber);
+    this.movieCardList$ByPageNumber.push(this.moviesService.fetchMovieCards('', this.currentPageNumber));
+    if (window.innerHeight > 400) {
+      this.showButtonUp = true;
+    }
   }
 
-  previousResultPage() {
-    if (this.resultPage > 1) {
-      this.resultPage--;
-      this.movieCards$ = this.moviesService.fetchMovieCards('', this.resultPage);
-    }
+  scrollUp() {
+    window.scrollTo(0, 0);
   }
 }

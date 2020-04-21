@@ -1,21 +1,24 @@
 <div class="container">
   <p>Вы искали "{{searchString}}"</p>
-  <div *ngIf="movieCards$ | async as movieCards; else loading">
-    <div class="movieCardList">
+  <div *ngFor="let resultPage of this.loadingPageNumbers">
+    <div *ngIf="movieCardList$ByPageNumber[resultPage - 1] | async as movieCards; else loading">
       <app-movie-card-list
-      [movieCards]="movieCards"
+        [movieCards]="movieCards"
       ></app-movie-card-list>
     </div>
-    <div class="download-block">
-      <div class="btn btn-link" *ngIf="resultPage > 1">
-        <a (click)="previousResultPage()">Назад</a>
-      </div>
-      <div class="btn btn-link" *ngIf="movieCards.length === 20">
-        <a (click)="nextResultPage()">Смотреть ещё</a>
-      </div>
-    </div>
+    <ng-template #loading>
+      <p>Загрузка фильмов...</p>
+    </ng-template>
   </div>
-  <ng-template #loading>
-    <p>Загрузка фильмов...</p>
-  </ng-template>
+  <div class="download-block">
+    <button class="btn" (click)="nextResultPage()">
+      Загрузить ещё
+    </button>
+    <button class="btn"
+            [ngStyle]="{display: showButtonUp ? '' : 'none'}"
+            (click)="scrollUp()"
+    >
+      Вверх
+    </button>
+  </div>
 </div>

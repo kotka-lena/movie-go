@@ -12,9 +12,11 @@ import {MoviesService} from '../shared/movies.service';
 })
 export class SearchPageComponent implements OnInit{
 
-  resultPage: number;
+  currentPageNumber: number;
   searchString = '';
-  movieCards$: Observable<MovieCard[]>;
+  movieCardList$ByPageNumber: Observable<MovieCard[]>[] = [];
+  loadingPageNumbers: number[] = [];
+  showButtonUp = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -22,25 +24,30 @@ export class SearchPageComponent implements OnInit{
   ) { }
 
   ngOnInit(): void {
-    this.resultPage = 1;
+    this.currentPageNumber = 1;
     this.route.queryParams.subscribe((queryParams: Params) => {
       if (this.searchString !== queryParams.q)
       {
         this.searchString = queryParams.q;
-        this.movieCards$ = this.moviesService.fetchMovieCards(this.searchString, this.resultPage);
+        this.movieCardList$ByPageNumber = [];
+        this.currentPageNumber = 1;
+        this.loadingPageNumbers = [];
+        this.loadingPageNumbers.push(this.currentPageNumber);
+        this.movieCardList$ByPageNumber.push(this.moviesService.fetchMovieCards(this.searchString, this.currentPageNumber));
       }
     });
   }
 
   nextResultPage() {
-    this.resultPage++;
-    this.movieCards$ = this.moviesService.fetchMovieCards(this.searchString, this.resultPage);
+    this.currentPageNumber++;
+    this.loadingPageNumbers.push(this.currentPageNumber);
+    this.movieCardList$ByPageNumber.push(this.moviesService.fetchMovieCards(this.searchString, this.currentPageNumber));
+    if (window.innerHeight > 400) {
+      this.showButtonUp = true;
+    }
   }
 
-  previousResultPage() {
-    if (this.resultPage > 1) {
-      this.resultPage--;
-      this.movieCards$ = this.moviesService.fetchMovieCards(this.searchString, this.resultPage);
-    }
+  scrollUp() {
+    window.scrollTo(0, 0);
   }
 }

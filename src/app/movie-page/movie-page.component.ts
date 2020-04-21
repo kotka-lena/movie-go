@@ -11,33 +11,39 @@ import {switchMap} from 'rxjs/operators';
   styleUrls: ['./movie-page.component.scss']
 })
 export class MoviePageComponent implements OnInit {
+
   movie$: Observable<Movie>;
-  recommendedMovieCards$: Observable<MovieCard[]>;
-  resultPage: number;
+  movieCardList$ByPageNumber: Observable<MovieCard[]>[] = [];
+  currentPageNumber: number;
+  loadingPageNumbers: number[] = [];
+  showButtonUp = false;
+
   constructor(
     private route: ActivatedRoute,
     private moviesService: MoviesService
   ) { }
 
   ngOnInit(): void {
-    this.resultPage = 1;
+    this.currentPageNumber = 1;
+    this.loadingPageNumbers.push(this.currentPageNumber);
     this.movie$ = this.route.params.pipe(
       switchMap((params: Params) => {
-      this.recommendedMovieCards$ = this.moviesService.fetchRecommendedById(+params.id, this.resultPage);
-      return this.moviesService.fetchMovieById(+params.id);
+        this.movieCardList$ByPageNumber.push(this.moviesService.fetchRecommendedById(+params.id, this.currentPageNumber));
+        return this.moviesService.fetchMovieById(+params.id);
       })
     );
   }
 
-  nextResultPage(movieId: number) {
-    this.resultPage++;
-    this.recommendedMovieCards$ = this.moviesService.fetchRecommendedById(movieId, this.resultPage);
+  nextResultPage() {
+    this.currentPageNumber++;
+    this.loadingPageNumbers.push(this.currentPageNumber);
+    this.movieCardList$ByPageNumber.push(this.moviesService.fetchMovieCards('', this.currentPageNumber));
+    if (window.innerHeight > 400) {
+      this.showButtonUp = true;
+    }
   }
 
-  previousResultPage(movieId: number) {
-    if (this.resultPage > 1) {
-      this.resultPage--;
-      this.recommendedMovieCards$ = this.moviesService.fetchRecommendedById(movieId, this.resultPage);
-    }
+  scrollUp() {
+    window.scrollTo(0, 0);
   }
 }
