@@ -70,6 +70,25 @@ section {
   }
 }
 
+.loading-message {
+  font-size: 16px;
+  color: thistle;
+}
+
+.list-title {
+  font-size: 18px;
+  color: aliceblue;
+}
+
+.movie-card-list {
+  display: flex;
+  flex-wrap: wrap;
+
+  .movie-card-box {
+
+  }
+}
+
 input {
   border: none;
   padding: 0.2rem 0.5rem;

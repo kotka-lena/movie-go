@@ -1,4 +1,6 @@
-<div class="movie" *ngIf="movie !== undefined">
+<div class="movie"
+     *ngIf="movie$ | async as movie; else loading"
+>
   <img *ngIf="movie.poster_path; else emptyPoster"
        src="https://image.tmdb.org/t/p/w300/{{movie.poster_path}}" alt="Poster" />
   <ng-template #emptyPoster>
@@ -19,10 +21,17 @@
           ></app-genre-list>
         </div>
       </div>
-      <app-favorites-button
-        [movieId]="movie.id"
-      ></app-favorites-button>
+      <div class="favorite-button-block">
+        <app-favorites-button
+          [movieId]="movie.id"
+        ></app-favorites-button>
+      </div>
     </div>
     <small>{{movie.overview}}</small>
   </div>
 </div>
+<ng-template #loading>
+  <div class="loading-message">
+    <b>Загрузка фильма...</b>
+  </div>
+</ng-template>

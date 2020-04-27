@@ -6,14 +6,11 @@
   <button class="btn"
     [ngStyle]="{display: this.favoriteMovieIds.length ? '' : 'none'}"
     (click)="this.favService.clear()">Очистить список</button>
-  <div *ngIf="movies !== []; else loading">
-    <div class="favMovieList">
-      <app-movie *ngFor="let movie of movies" [ngStyle]="{display: (inList(movie.id)) ? '' : 'none'}"
-        [movie]="movie"
-      ></app-movie>
-    </div>
+  <div class="favMovieList">
+    <app-movie
+      *ngFor="let movieId of this.favoriteMovieIds"
+      [ngStyle]="{display: (inList(movieId)) ? '' : 'none'}"
+      [movieId]="movieId"
+    ></app-movie>
   </div>
-  <ng-template #loading>
-    <p>Загружаем избранные фильмы...</p>
-  </ng-template>
 </div>

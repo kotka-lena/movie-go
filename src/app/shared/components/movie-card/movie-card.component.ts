@@ -21,7 +21,7 @@ export class MovieCardComponent implements OnInit {
   }
 
   goToMoviePage(movieCardId: number) {
-    this.router.navigate(['/movie', movieCardId]);
     this.moviesService.movieActivated$.next(movieCardId);
+    this.router.navigate(['/movie', movieCardId]);
   }
 }

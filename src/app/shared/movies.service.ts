@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable, Subject, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
-import {Genre, GenresGetResponse, MovieCard, MovieCardsGetResponse, Movie} from './interfaces';
+import {Genre, GenresGetResponse, Movie, MovieCardsGetResponse, SearchMode} from './interfaces';
 import {environment} from '../../environments/environment';
 
 @Injectable({providedIn: 'root'})
@@ -17,6 +17,7 @@ export class MoviesService {
     let params = new HttpParams();
     params = params.append('api_key', 'c4969d1f52e5bc9d149955f64ac31dd4');
     params = params.append('language', 'ru-RU');
+
     return this.http.get(`${environment.movieDbUrl}/genre/movie/list`,
       {
         params
@@ -31,36 +32,12 @@ export class MoviesService {
       );
   }
 
-  fetchMovieCards(searchString: string, resultPage: number): Observable<MovieCard[]> {
-    let requestUrl: string;
-    let params = new HttpParams();
-    params = params.append('api_key', 'c4969d1f52e5bc9d149955f64ac31dd4');
-    params = params.append('language', 'ru-RU');
-    params = params.append('page', resultPage.toString());
-
-    if (searchString === '')
-    {
-      requestUrl = `${environment.movieDbUrl}/movie/popular`;
-    }
-    else
-    {
-      params = params.append('query', searchString);
-      requestUrl = `${environment.movieDbUrl}/search/movie`;
-    }
-    return this.http.get(requestUrl, { params })
-      .pipe(map((response: MovieCardsGetResponse) => response.results),
-        catchError(error => {
-          console.log('Error: ', error.message);
-          return throwError(error);
-        })
-      );
-  }
-
   fetchMovieById(id: number): Observable<Movie> {
     const requestUrl = `${environment.movieDbUrl}/movie/`.concat(String(id));
     let params = new HttpParams();
     params = params.append('api_key', 'c4969d1f52e5bc9d149955f64ac31dd4');
     params = params.append('language', 'ru-RU');
+
     return this.http.get(requestUrl, { params })
       .pipe(map((response: Movie) => {
           return response;
@@ -72,14 +49,37 @@ export class MoviesService {
       );
   }
 
-  fetchRecommendedById(id: number, resultPage: number): Observable<MovieCard[]> {
-    const requestUrl = `${environment.movieDbUrl}/movie/`.concat(String(id)).concat('/recommendations');
+  fetchMovieCardsResponse(
+    searchMode: SearchMode, searchString: string, movieId: number, pageNumber: number
+  ): Observable<MovieCardsGetResponse> {
+    let requestUrl: string;
     let params = new HttpParams();
     params = params.append('api_key', 'c4969d1f52e5bc9d149955f64ac31dd4');
     params = params.append('language', 'ru-RU');
-    params = params.append('page', String(resultPage));
-    return this.http.get(requestUrl, { params })
-      .pipe(map((response: MovieCardsGetResponse) => response.results),
+    params = params.append('page', pageNumber.toString());
+
+    switch (searchMode) {
+      case SearchMode.Popular: {
+        requestUrl = `${environment.movieDbUrl}/movie/popular`;
+        break;
+      }
+      case SearchMode.ByString: {
+        requestUrl = `${environment.movieDbUrl}/search/movie`;
+        params = params.append('query', searchString);
+        break;
+      }
+      case SearchMode.Recommended: {
+        requestUrl = `${environment.movieDbUrl}/movie/`.concat(String(movieId)).concat('/recommendations');
+        break;
+      }
+      default: {
+        console.log('Error: Invalid Search Mode ', searchMode);
+        break;
+      }
+    }
+
+    return this.http.get(requestUrl, {params})
+      .pipe(map((response: MovieCardsGetResponse) => response),
         catchError(error => {
           console.log('Error: ', error.message);
           return throwError(error);

@@ -1,32 +1,12 @@
 <div class="container">
-  <div *ngIf="movie$ | async as movie; else loading">
+  <div *ngIf="movieId !== undefined">
     <app-movie
-      [movie]="movie"
+      [movieId]="movieId"
     ></app-movie>
-    <p>C этим фильмом часто смотрят:</p>
-    <div *ngFor="let resultPage of this.loadingPageNumbers">
-      <div *ngIf="movieCardList$ByPageNumber[resultPage - 1] | async as movieCards; else loading">
-        <app-movie-card-list
-          [movieCards]="movieCards"
-        ></app-movie-card-list>
-      </div>
-      <ng-template #loading>
-        <p>Загрузка фильмов...</p>
-      </ng-template>
-    </div>
-    <div class="download-block">
-      <button class="btn" (click)="nextResultPage()">
-        Загрузить ещё
-      </button>
-      <button class="btn"
-              [ngStyle]="{display: showButtonUp ? '' : 'none'}"
-              (click)="scrollUp()"
-      >
-        Вверх
-      </button>
-    </div>
   </div>
-  <ng-template #loading>
-    <p>Загрузка фильма...</p>
-  </ng-template>
+  <app-movie-card-list *ngIf="movieId !== undefined && searchMode !== undefined"
+    [searchMode] = "searchMode"
+    [movieId]="movieId"
+  >
+  </app-movie-card-list>
 </div>

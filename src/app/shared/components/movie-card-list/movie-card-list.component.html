@@ -1,10 +1,31 @@
-<div *ngIf="movieCards.length; else noMovieCards">
-  <div class="movie-card-list">
-    <app-movie-card *ngFor="let movieCard of movieCards"
-      [movieCard]="movieCard"
+<div *ngIf="response$ | async as response; else loading">
+  <div class="list-title">
+    {{listTitle}}
+  </div>
+  <div class="movie-card-list" *ngIf="response.results.length; else noMovieCards">
+    <app-movie-card *ngFor="let movieCard of response.results"
+                    [movieCard]="movieCard"
     ></app-movie-card>
   </div>
+  <ng-template #noMovieCards>
+    <p>Фильмы не найдены</p>
+  </ng-template>
+  <div class="download-block">
+    <button class="btn"
+            *ngIf="currentPageNumber < response.total_pages"
+            (click)="addResults()">
+      Загрузить ещё
+    </button>
+    <button class="btn"
+            *ngIf="showButtonUp"
+            (click)="scrollUp()"
+    >
+      Вверх
+    </button>
+  </div>
 </div>
-<ng-template #noMovieCards>
-  <p>Фильмы не найдены</p>
+<ng-template #loading>
+  <div class="loading-message">
+    <b>Загрузка фильмов...</b>
+  </div>
 </ng-template>

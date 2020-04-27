@@ -11,7 +11,7 @@ export class FavouritesService implements OnDestroy {
   onChange$: Subject<number> = new Subject<number>();
 
   constructor(private moviesService: MoviesService) {
-    this.subscribeToAllChanges();
+    this.subscribeToAllMovieActivating();
   }
 
   inFavourites(movieId: number) {
@@ -71,16 +71,18 @@ export class FavouritesService implements OnDestroy {
       .concat(newFavoriteMovieIds.filter(id => !this.favouriteMovieIds.includes(id)));
   }
 
-  subscribeToAllChanges() {
+  subscribeToAllMovieActivating() {
     if (!this.movieSub) {
       this.movieSub = this.moviesService.movieActivated$.subscribe((movieId: number) => {
         this.nextSubjectForMovieId(movieId);
+        this.onChange$.next(movieId);
       });
     }
     window.addEventListener('storage', (event) => {
       if (event.key === 'fav') {
         for (const movieId of this.changedMovieIds()) {
           this.nextSubjectForMovieId(movieId);
+          this.onChange$.next(movieId);
         }
       }
     });

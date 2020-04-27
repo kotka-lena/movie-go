@@ -1,6 +1,5 @@
 <div class="movieCard">
-  <a [routerLink]="['/movie', movieCard.id]"
-     (click)="goToMoviePage(movieCard.id)"
+  <div (click)="goToMoviePage(movieCard.id)"
   >
     <img *ngIf="movieCard.poster_path; else emptyPoster"
          src="https://image.tmdb.org/t/p/w300/{{movieCard.poster_path}}" alt="Poster" />
@@ -11,7 +10,7 @@
       <p>{{movieCard.title}}</p>
       <small>{{movieCard.release_date | slice:0:4}} г</small>
     </div>
-  </a>
+  </div>
   <div class="genres-box">
     <app-genre-list
       [genreIds]="movieCard.genre_ids"

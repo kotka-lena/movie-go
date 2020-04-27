@@ -1,23 +1,6 @@
 <div class="container">
-  <div *ngFor="let resultPage of this.loadingPageNumbers">
-    <div *ngIf="movieCardList$ByPageNumber[resultPage - 1] | async as movieCards; else loading">
-      <app-movie-card-list
-        [movieCards]="movieCards"
-      ></app-movie-card-list>
-    </div>
-    <ng-template #loading>
-      <p>Загрузка фильмов...</p>
-    </ng-template>
-  </div>
-  <div class="download-block">
-    <button class="btn" (click)="nextResultPage()">
-      Загрузить ещё
-    </button>
-    <button class="btn"
-            [ngStyle]="{display: showButtonUp ? '' : 'none'}"
-            (click)="scrollUp()"
-    >
-      Вверх
-    </button>
-  </div>
+  <app-movie-card-list
+    [searchMode] = "searchMode"
+  >
+  </app-movie-card-list>
 </div>

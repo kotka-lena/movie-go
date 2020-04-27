@@ -1,7 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {MoviesService} from '../shared/movies.service';
 import {FavouritesService} from '../shared/favourites.service';
-import {Movie} from '../shared/interfaces';
 import {Subscription} from 'rxjs';
 
 @Component({
@@ -12,12 +10,10 @@ import {Subscription} from 'rxjs';
 export class FavoritesPageComponent implements OnInit, OnDestroy {
 
   favoriteMovieIds: number[] = [];
-  movies: Movie[] = [];
   fSub: Subscription;
 
   constructor(
-    public favService: FavouritesService,
-    private moviesService: MoviesService
+    public favService: FavouritesService
   ) { }
 
   ngOnInit(): void {
@@ -25,11 +21,6 @@ export class FavoritesPageComponent implements OnInit, OnDestroy {
     this.fSub = this.favService.onChange$.subscribe(() => {
       this.favoriteMovieIds = this.favService.getAll();
     });
-    for (const movieId of this.favoriteMovieIds) {
-      this.moviesService.fetchMovieById(movieId).subscribe((movie: Movie) => {
-        this.movies.push(movie);
-      });
-    }
   }
 
   inList(movieId: number) {

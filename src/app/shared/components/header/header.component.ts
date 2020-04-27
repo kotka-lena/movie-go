@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import { Router} from '@angular/router';
+import {Router} from '@angular/router';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {MoviesService} from '../../movies.service';
-import {MovieCard} from '../../interfaces';
+import {MovieCard, MovieCardsGetResponse, SearchMode} from '../../interfaces';
 
 @Component({
   selector: 'app-header',
@@ -29,13 +29,6 @@ export class HeaderComponent implements OnInit {
   }
 
   goToSearchPage() {
-    if (this.searchForm.get('search').value.trim()) {
-      this.router.navigate(['/search'], { queryParams: { q: this.searchForm.get('search').value.trim() } });
-      this.searchForm.get('search').setValue('');
-    }
-  }
-
-  submit() {
     if (this.searchForm.get('search').value.trim()) {
       this.router.navigate(['/search'], { queryParams: { q: this.searchForm.get('search').value.trim() } });
       this.searchForm.get('search').setValue('');
@@ -83,15 +76,19 @@ export class HeaderComponent implements OnInit {
     {
       return;
     }
-    this.moviesService.fetchMovieCards(searchString, 1).subscribe((results: MovieCard[]) => {
-      this.searchInfoByString.set(searchString, results);
-      this.showResultsBox = true;
-    });
+    if (searchString.length > 1) {
+      this.moviesService.fetchMovieCardsResponse(
+        SearchMode.ByString, searchString, 0, 1
+      ).subscribe((response: MovieCardsGetResponse) => {
+        this.searchInfoByString.set(searchString, response.results);
+        this.showResultsBox = true;
+      });
+    }
   }
 
   goToMoviePage(movieCardId: number) {
-    this.router.navigate(['/movie', movieCardId]);
     this.moviesService.movieActivated$.next(movieCardId);
+    this.router.navigate(['/movie', movieCardId]);
     this.searchForm.get('search').setValue('');
   }
 }

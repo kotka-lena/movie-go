@@ -56,6 +56,11 @@ export enum MovieStatus {
   Released = 'Released',
   Canceled = 'Canceled',
 }
+export enum SearchMode {
+  Popular = 0,
+  Recommended = 1,
+  ByString= 2,
+}
 
 export interface Movie {
   adult: boolean;

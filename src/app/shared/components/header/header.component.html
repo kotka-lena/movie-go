@@ -9,20 +9,17 @@
             <li><a routerLink="/favourites">Избранное</a></li>
           </ul>
         </nav>
-        <form class="searchForm" [formGroup]="searchForm" (ngSubmit)="submit()">
+        <form class="searchForm" [formGroup]="searchForm" (ngSubmit)="goToSearchPage()">
           <div class="inputSearch">
             <label>
               <input type="text" placeholder="Фильм" formControlName="search" (keypress)="searchSetup()" (change)="searchSetup()" (keyup)="searchSetup()">
             </label>
             <button class="btn" type="submit">Поиск</button>
           </div>
-          <div *ngIf="(searchForm.get('search').valid
-                  && searchForm.get('search').dirty)
-                  && !!searchForm.get('search').value
-                  && showResultsBox"
+          <div *ngIf="showResultsBox && this.searchInfoByString.has(searchForm.get('search').value.trim())"
             class="searchResults"
           >
-            <ul *ngIf="this.searchInfoByString.has(searchForm.get('search').value.trim()); else loading">
+            <ul *ngIf="this.searchInfoByString.get(searchForm.get('search').value.trim()).length > 0; else noResults">
               <li *ngFor="let movieCard of this.searchInfoByString.get(searchForm.get('search').value.trim())">
                 <a (click)="goToMoviePage(movieCard.id)">
                   <div class="movie-link">
@@ -33,12 +30,11 @@
                     </ng-template>
                     {{movieCard.title}}, {{movieCard.release_date | slice:0:4}}
                   </div>
-                </a
-                  >
+                </a>
               </li>
             </ul>
-            <ng-template #loading>
-              Загружаем...
+            <ng-template #noResults>
+              по запросу {{searchForm.get('search').value.trim()}} нет результатов
             </ng-template>
             <div class="openAllResults">
               <a (click)="goToSearchPage()">
