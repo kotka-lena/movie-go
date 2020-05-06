@@ -4,6 +4,8 @@ import { NgModule } from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
 
+import { ClickOutsideModule } from 'ng-click-outside';
+
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomePageComponent } from './home-page/home-page.component';
@@ -38,7 +40,8 @@ import { FavoritesButtonComponent } from './shared/components/favorites-button/f
         AppRoutingModule,
         HttpClientModule,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        ClickOutsideModule
     ],
   providers: [],
   bootstrap: [AppComponent]

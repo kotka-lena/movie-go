@@ -1,52 +1,79 @@
-import {Component, Input, OnChanges, OnDestroy, OnInit} from '@angular/core';
-import {Observable, Subject, Subscription} from 'rxjs';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Observable, Subject, Subscription, throwError} from 'rxjs';
 import {MovieCard, MovieCardsGetResponse, SearchMode} from '../../interfaces';
 import {MoviesService} from '../../movies.service';
-import {concatMap, map, startWith} from 'rxjs/operators';
+import {catchError, concatMap, map, startWith} from 'rxjs/operators';
+import {SearchParams} from '../../classes';
 
 @Component({
   selector: 'app-movie-card-list',
   templateUrl: './movie-card-list.component.html',
   styleUrls: ['./movie-card-list.component.scss']
 })
-export class MovieCardListComponent implements OnChanges, OnInit, OnDestroy {
+export class MovieCardListComponent implements OnInit, OnDestroy {
 
-  @Input() searchMode: SearchMode;
-  @Input() searchString = '';
-  @Input() movieId = 0;
-
-  currentPageNumber: number;
-  showButtonUp = false;
+  @Input() searchParams: SearchParams;
 
   pagination$: Subject<number> = new Subject<number>();
   response$: Observable<MovieCardsGetResponse>;
   movieCards: MovieCard[] = [];
-  listTitle = '';
   movieSub: Subscription;
+  querySub: Subscription;
+  listTitle = '';
+  page = 1;
+  error = false;
+  showButtonUp = false;
 
   constructor(private moviesService: MoviesService) { }
 
-  ngOnChanges() {
-    if (!this.movieSub && this.searchMode === SearchMode.Recommended) {
-      this.movieSub = this.moviesService.movieActivated$.subscribe((movieId: number) => {
-        if (this.movieId !== movieId) {
-          this.movieId = movieId;
-          this.movieCards = [];
-          this.currentPageNumber = 0;
-          this.addResults();
+  ngOnInit(): void {
+    this.updateListTitle();
+
+    this.response$ = this.pagination$.pipe(
+      startWith(1),
+      concatMap((page: number) => {
+        return this.moviesService.getMovieCardsResult(this.searchParams.withPage(page));
+      })
+    ).pipe(
+      map((response: MovieCardsGetResponse) => {
+        this.error = false;
+        response.results = this.movieCards.concat(response.results);
+        this.movieCards = response.results;
+        if (window.innerHeight > 800) {
+          this.showButtonUp = true;
         }
+        return response;
+      }),
+      catchError(error => {
+        this.error = true;
+        return throwError(error);
+      }));
+
+    if (!this.movieSub && this.searchParams.mode === SearchMode.Recommended) {
+      this.movieSub = this.moviesService.movieActivated$.subscribe((movieId: number) => {
+        if (this.searchParams.movieId === movieId) { return; }
+        this.searchParams = new SearchParams(SearchMode.Recommended, '', movieId, 1);
+        this.restartSearch();
+      });
+    }
+
+    if (!this.querySub && this.searchParams.mode === SearchMode.ByString) {
+      this.querySub = this.moviesService.queryActivated$.subscribe((searchString: string) => {
+        if (this.searchParams.query === searchString) { return; }
+        this.searchParams  = new SearchParams(SearchMode.ByString, searchString, 0, 1);
+        this.restartSearch();
       });
     }
   }
 
-  ngOnInit(): void {
-    switch (this.searchMode) {
+  updateListTitle() {
+    switch (this.searchParams.mode) {
       case SearchMode.Popular: {
         this.listTitle = 'Популярные фильмы:';
         break;
       }
       case SearchMode.ByString: {
-        this.listTitle = 'Вы искали "' + this.searchString + '":';
+        this.listTitle = 'Вы искали "' + this.searchParams.query + '":';
         break;
       }
       case SearchMode.Recommended: {
@@ -54,29 +81,22 @@ export class MovieCardListComponent implements OnChanges, OnInit, OnDestroy {
         break;
       }
       default: {
-        console.log('Error: Invalid Search Mode ', this.searchMode);
+        console.log('Error: Invalid Search Mode');
         break;
       }
     }
-    this.currentPageNumber = 1;
-    this.response$ = this.pagination$.pipe(
-      startWith(1),
-      concatMap(() => this.moviesService.fetchMovieCardsResponse(
-        this.searchMode, this.searchString, this.movieId, this.currentPageNumber
-      )))
-      .pipe(
-        map((response: MovieCardsGetResponse) => {
-          response.results = this.movieCards.concat(response.results);
-          this.movieCards = response.results;
-          if (window.innerHeight > 400) {
-            this.showButtonUp = true;
-          }
-          return response;
-        }));
   }
 
   addResults() {
-    this.pagination$.next(this.currentPageNumber++);
+    this.page++;
+    this.pagination$.next(this.page);
+  }
+
+  restartSearch() {
+    this.updateListTitle();
+    this.page = 1;
+    this.movieCards = [];
+    this.pagination$.next(this.page);
   }
 
   scrollUp() {
@@ -87,6 +107,9 @@ export class MovieCardListComponent implements OnChanges, OnInit, OnDestroy {
     this.pagination$.unsubscribe();
     if (this.movieSub) {
       this.movieSub.unsubscribe();
+    }
+    if (this.querySub) {
+      this.querySub.unsubscribe();
     }
   }
 }

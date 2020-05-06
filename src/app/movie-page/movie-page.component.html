@@ -1,12 +1,11 @@
 <div class="container">
-  <div *ngIf="movieId !== undefined">
+  <div *ngIf="searchParams.movieId !== undefined">
     <app-movie
-      [movieId]="movieId"
+      [movieId] = "searchParams.movieId"
     ></app-movie>
+    <app-movie-card-list
+      [searchParams] = "searchParams"
+    >
+    </app-movie-card-list>
   </div>
-  <app-movie-card-list *ngIf="movieId !== undefined && searchMode !== undefined"
-    [searchMode] = "searchMode"
-    [movieId]="movieId"
-  >
-  </app-movie-card-list>
 </div>

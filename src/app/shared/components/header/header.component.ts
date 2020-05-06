@@ -1,8 +1,16 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {MoviesService} from '../../movies.service';
-import {MovieCard, MovieCardsGetResponse, SearchMode} from '../../interfaces';
+import {MovieCardsGetResponse, SearchMode} from '../../interfaces';
+import {SearchParams} from '../../classes';
+import {fromEvent, Observable, merge} from 'rxjs';
+import {
+  switchMap,
+  debounceTime,
+  filter,
+  map, tap
+} from 'rxjs/operators';
 
 @Component({
   selector: 'app-header',
@@ -11,9 +19,9 @@ import {MovieCard, MovieCardsGetResponse, SearchMode} from '../../interfaces';
 })
 export class HeaderComponent implements OnInit {
 
-  quickSearchProcessedString = null;
-  searchTimer = null;
-  searchInfoByString: Map<string, MovieCard[]> = new Map<string, MovieCard[]>();
+  @ViewChild('searchInput', {static: true}) searchInputRef: ElementRef;
+  response$: Observable<MovieCardsGetResponse> = new Observable<MovieCardsGetResponse>();
+  error = false;
   showResultsBox = false;
   searchForm: FormGroup;
 
@@ -26,69 +34,48 @@ export class HeaderComponent implements OnInit {
     this.searchForm = new FormGroup({
       search: new FormControl('', Validators.minLength(2))
     });
+    const fromKeyUp = fromEvent(this.searchInputRef.nativeElement, 'keyup').pipe(
+      debounceTime(500),
+      map((event: any) => event.target.value.trim()),
+      filter((searchString: string) => searchString.length > 1)
+    );
+    const fromClick = fromEvent(this.searchInputRef.nativeElement, 'click').pipe(
+      map((event: any) => event.target.value.trim()),
+      filter((searchString: string) => searchString.length > 1)
+    );
+    this.response$ = merge(fromKeyUp, fromClick).pipe(
+      switchMap((searchString: string) => this.search(searchString))
+    );
   }
 
-  goToSearchPage() {
-    if (this.searchForm.get('search').value.trim()) {
-      this.router.navigate(['/search'], { queryParams: { q: this.searchForm.get('search').value.trim() } });
-      this.searchForm.get('search').setValue('');
-    }
+  search(searchString: string): Observable<MovieCardsGetResponse> {
+    const searchParams: SearchParams = new SearchParams(SearchMode.ByString, searchString, 0, 1);
+    return this.moviesService.getMovieCardsResult(searchParams).pipe(
+      tap({
+        next: () => { this.showResultsBox = true; },
+        error: () => { this.error = true; }
+    }));
   }
 
-  searchSetup() {
-    const searchString = this.searchForm.get('search').value.trim();
-    if (!(searchString && this.searchForm.get('search').valid)) {
-      this.quickSearchProcessedString = null;
-      return;
-    }
-    if (searchString === this.quickSearchProcessedString) {
-      return;
-    }
-    this.quickSearchProcessedString = null;
-    if (this.applyResultsFromCache()) {
-      return;
-    }
-    if (this.searchTimer) {
-      window.clearTimeout(this.searchTimer);
-    }
-    this.searchTimer = window.setTimeout(() => {
-      this.searchTimer = null;
-      this.quickSearch();
-    }, 500);
-  }
-
-  applyResultsFromCache() {
-    const searchString = this.searchForm.get('search').value.trim();
-
-    if (!this.searchInfoByString.has(searchString)) {
-      this.showResultsBox = false;
-      return false;
-    }
-
-    this.showResultsBox = !!this.searchInfoByString.get(searchString).length;
-    this.quickSearchProcessedString = searchString;
-    return true;
-  }
-
-  quickSearch() {
-    const searchString = this.searchForm.get('search').value.trim();
-    if (this.searchForm.get('search').invalid)
-    {
-      return;
-    }
-    if (searchString.length > 1) {
-      this.moviesService.fetchMovieCardsResponse(
-        SearchMode.ByString, searchString, 0, 1
-      ).subscribe((response: MovieCardsGetResponse) => {
-        this.searchInfoByString.set(searchString, response.results);
-        this.showResultsBox = true;
-      });
-    }
+  goToSearchPage(searchString: string) {
+    if (searchString.length < 2) { return; }
+    this.moviesService.queryActivated$.next(searchString);
+    this.router.navigate(['/search'], { queryParams: { q: searchString } });
+    this.clearForm();
   }
 
   goToMoviePage(movieCardId: number) {
     this.moviesService.movieActivated$.next(movieCardId);
     this.router.navigate(['/movie', movieCardId]);
+    this.clearForm();
+  }
+
+  clearForm() {
     this.searchForm.get('search').setValue('');
+    this.showResultsBox = false;
+  }
+
+  onClickedOutside(event: Event) {
+    this.showResultsBox = false;
   }
 }

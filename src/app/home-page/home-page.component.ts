@@ -1,5 +1,6 @@
 import { Component, OnInit} from '@angular/core';
 import {SearchMode} from '../shared/interfaces';
+import {SearchParams} from '../shared/classes';
 
 @Component({
   selector: 'app-home-page',
@@ -8,11 +9,11 @@ import {SearchMode} from '../shared/interfaces';
 })
 export class HomePageComponent implements OnInit {
 
-  searchMode: SearchMode;
+  searchParams: SearchParams;
 
   constructor() { }
 
   ngOnInit(): void {
-    this.searchMode = SearchMode.Popular;
+    this.searchParams = new SearchParams(SearchMode.Popular, '', 0, 1);
   }
 }

@@ -9,36 +9,47 @@
             <li><a routerLink="/favourites">Избранное</a></li>
           </ul>
         </nav>
-        <form class="searchForm" [formGroup]="searchForm" (ngSubmit)="goToSearchPage()">
+        <form class="searchForm"
+              [formGroup]="searchForm"
+              (ngSubmit)="goToSearchPage(searchForm.get('search').value.trim())"
+              (clickOutside)="onClickedOutside($event)"
+        >
           <div class="inputSearch">
             <label>
-              <input type="text" placeholder="Фильм" formControlName="search" (keypress)="searchSetup()" (change)="searchSetup()" (keyup)="searchSetup()">
+              <input type="text" #searchInput placeholder="Фильм"
+                     formControlName="search"
+              >
             </label>
             <button class="btn" type="submit">Поиск</button>
           </div>
-          <div *ngIf="showResultsBox && this.searchInfoByString.has(searchForm.get('search').value.trim())"
-            class="searchResults"
-          >
-            <ul *ngIf="this.searchInfoByString.get(searchForm.get('search').value.trim()).length > 0; else noResults">
-              <li *ngFor="let movieCard of this.searchInfoByString.get(searchForm.get('search').value.trim())">
-                <a (click)="goToMoviePage(movieCard.id)">
-                  <div class="movie-link">
+          <div [ngStyle]="{ display: showResultsBox ? '' : 'none' }">
+            <div class="searchResults" *ngIf="response$ | async as response">
+              <ul *ngIf="response.results.length > 0; else noResults">
+                <li *ngFor="let movieCard of response.results">
+                  <div class="movie-link" (click)="goToMoviePage(movieCard.id)">
                     <img *ngIf="movieCard.poster_path; else emptyPoster"
-                         src="https://image.tmdb.org/t/p/w300/{{movieCard.poster_path}}" alt="Poster" />
+                         src="https://image.tmdb.org/t/p/w300/{{movieCard.poster_path}}" alt="Poster"
+                    >
                     <ng-template #emptyPoster>
-                      <img src="../../../../assets/images/empty_poster.jpg" alt="Poster" />
+                      <img src="../../../../assets/images/empty_poster.jpg" alt="Poster">
                     </ng-template>
-                    {{movieCard.title}}, {{movieCard.release_date | slice:0:4}}
+                    <span>{{movieCard.title}}, {{movieCard.release_date | slice:0:4}}</span>
                   </div>
+                </li>
+              </ul>
+              <ng-template #noResults>
+                по запросу {{searchForm.get('search').value.trim()}} нет результатов
+              </ng-template>
+              <div *ngIf="response.results.length > 0" class="openAllResults">
+                <a (click)="goToSearchPage(searchForm.get('search').value.trim())">
+                  Открыть все результаты поиска
                 </a>
-              </li>
-            </ul>
-            <ng-template #noResults>
-              по запросу {{searchForm.get('search').value.trim()}} нет результатов
-            </ng-template>
-            <div class="openAllResults">
-              <a (click)="goToSearchPage()">
-                Открыть все результаты поиска
+              </div>
+            </div>
+            <div *ngIf="error" class="openAllResults">
+              Что-то пошло не так.
+              <a (click)="goToSearchPage(searchForm.get('search').value.trim())">
+                Попробовать снова
               </a>
             </div>
           </div>

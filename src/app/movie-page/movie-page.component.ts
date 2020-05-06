@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {SearchMode} from '../shared/interfaces';
+import {SearchParams} from '../shared/classes';
 import {ActivatedRoute, Params} from '@angular/router';
 
 @Component({
@@ -9,17 +10,15 @@ import {ActivatedRoute, Params} from '@angular/router';
 })
 export class MoviePageComponent implements OnInit {
 
-  movieId: number;
-  searchMode: SearchMode;
+  searchParams: SearchParams;
 
   constructor(
     private route: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
-    this.searchMode = SearchMode.Recommended;
     this.route.params.subscribe((params: Params) => {
-        this.movieId = +params.id;
+      this.searchParams = new SearchParams(SearchMode.Recommended, '', +params.id, 1);
     });
   }
 }

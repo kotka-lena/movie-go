@@ -1,28 +1,29 @@
-import {Component, Input, OnChanges, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {Movie} from '../../interfaces';
 import {Observable, Subscription} from 'rxjs';
 import {MoviesService} from '../../movies.service';
-import {map} from 'rxjs/operators';
+import {tap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-movie',
   templateUrl: './movie.component.html',
   styleUrls: ['./movie.component.scss']
 })
-export class MovieComponent implements OnChanges, OnInit {
+export class MovieComponent implements OnInit {
 
   @Input() movieId: number;
 
   movie$: Observable<Movie>;
   genreIds: number[] = [];
   movieSub: Subscription;
+  error = false;
 
   constructor(
     private moviesService: MoviesService
   ) { }
 
-  ngOnChanges() {
-    window.scrollTo(0, 0);
+  ngOnInit(): void {
+    this.updateMovie();
     if (!this.movieSub) {
       this.movieSub = this.moviesService.movieActivated$.subscribe((movieId: number) => {
         if (this.movieId !== movieId) {
@@ -33,18 +34,17 @@ export class MovieComponent implements OnChanges, OnInit {
     }
   }
 
-  ngOnInit(): void {
-    this.updateMovie();
-  }
-
   updateMovie() {
-    this.movie$ = this.moviesService.fetchMovieById(this.movieId)
-      .pipe(
-        map((movie: Movie) => {
+    this.movie$ = this.moviesService.getMovieResult(this.movieId).pipe(
+      tap({
+        next: (movie: Movie) => {
+          this.error = false;
+          window.scrollTo(0, 0);
           for (const genre of movie.genres) {
             this.genreIds.push(genre.id);
           }
-          return movie;
-        }));
+        },
+        error: () => { this.error = true; }
+    }));
   }
 }

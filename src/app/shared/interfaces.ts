@@ -27,10 +27,6 @@ export interface Genre {
   name: string;
 }
 
-export interface GenresGetResponse {
-  genres: Genre[];
-}
-
 export interface ProductionCompany {
   name: string;
   id: number;
@@ -56,6 +52,7 @@ export enum MovieStatus {
   Released = 'Released',
   Canceled = 'Canceled',
 }
+
 export enum SearchMode {
   Popular = 0,
   Recommended = 1,

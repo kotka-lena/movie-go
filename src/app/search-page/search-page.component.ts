@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Params} from '@angular/router';
 
 import {SearchMode} from '../shared/interfaces';
+import {SearchParams} from '../shared/classes';
 
 @Component({
   selector: 'app-search-page',
@@ -10,20 +11,15 @@ import {SearchMode} from '../shared/interfaces';
 })
 export class SearchPageComponent implements OnInit {
 
-  searchString = '';
-  searchMode: SearchMode;
+  searchParams: SearchParams;
 
   constructor(
     private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
-    this.searchMode = SearchMode.ByString;
     this.route.queryParams.subscribe((queryParams: Params) => {
-      if (this.searchString !== queryParams.q)
-      {
-        this.searchString = queryParams.q;
-      }
+      this.searchParams = new SearchParams(SearchMode.ByString, queryParams.q, 0, 1);
     });
   }
 }
